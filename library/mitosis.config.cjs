@@ -7,7 +7,9 @@ module.exports = {
   "targets": [
     "react",
     "svelte",
-    "qwik"
+    "qwik",
+    "vue",
+    "customElement"
   ],
   "dest": "packages",
   "commonOptions": {
