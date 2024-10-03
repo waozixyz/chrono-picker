@@ -15,7 +15,7 @@ const transform = function transform2(props, state, x) {
   return props.transformData ? props.transformData(x) : x.name;
 };
 const AutoComplete = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((props) => {
-  useStylesScopedQrl(/* @__PURE__ */ inlinedQrl(STYLES, "AutoComplete_component_useStylesScoped_o3cUATH7B2E"));
+  useStylesScopedQrl(/* @__PURE__ */ inlinedQrl(STYLES$1, "AutoComplete_component_useStylesScoped_o3cUATH7B2E"));
   const state = useStore({
     inputVal: "",
     showSuggestions: false,
@@ -95,7 +95,7 @@ const AutoComplete = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((pr
     }), 1, "tU_1") : null
   ], 1, "tU_2");
 }, "AutoComplete_component_2b0Y8LQOXVI"));
-const STYLES = `
+const STYLES$1 = `
 .div-AutoComplete {
   padding: 10px;
   max-width: 700px;
@@ -187,6 +187,21 @@ const updateTime = function updateTime2(props, state) {
   newDate.setMinutes(state.minute);
   props.onChange?.(newDate);
 };
+const setHour = function setHour2(props, state, value) {
+  const hourInt = parseInt(value, 10);
+  if (isNaN(hourInt))
+    return;
+  const maxHour = props.format === "24h" ? 23 : 12;
+  state.hour = Math.max(0, Math.min(hourInt, maxHour));
+  updateTime(props, state);
+};
+const setMinute = function setMinute2(props, state, value) {
+  const minuteInt = parseInt(value, 10);
+  if (isNaN(minuteInt))
+    return;
+  state.minute = Math.max(0, Math.min(minuteInt, 59));
+  updateTime(props, state);
+};
 const incrementHour = function incrementHour2(props, state) {
   state.hour = (state.hour + 1) % (props.format === "24h" ? 24 : 12);
   if (state.hour === 0 && props.format === "12h")
@@ -212,10 +227,23 @@ const togglePeriod = function togglePeriod2(props, state) {
   updateTime(props, state);
 };
 const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((props) => {
+  useStylesScopedQrl(/* @__PURE__ */ inlinedQrl(STYLES, "TimePicker_component_useStylesScoped_tAVqQNaeX0E"));
   const state = useStore({
+    accentColor: props.accentColor || "#007bff",
+    backgroundColor: props.backgroundColor || "#ffffff",
+    borderStyle: props.showBorder ? `1px solid ${props.accentColor || "#007bff"}` : "none",
+    buttonColor: "#666666",
+    buttonFontSize: props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px",
+    buttonHoverBackgroundColor: "#f0f0f0",
+    buttonHoverColor: "#333333",
+    cellHeight: props.size === "small" ? "24px" : props.size === "large" ? "38px" : "30px",
+    cellWidth: props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px",
+    fontSize: props.size === "small" ? "12px" : props.size === "large" ? "20px" : "16px",
     hour: 0,
     minute: 0,
-    period: "AM"
+    period: "AM",
+    smallCellHeight: props.size === "small" ? "12px" : props.size === "large" ? "19px" : "15px",
+    textColor: props.textColor || "#333333"
   });
   useVisibleTaskQrl(/* @__PURE__ */ inlinedQrl(() => {
     const [props2, state2] = useLexicalScope();
@@ -245,21 +273,24 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
   return /* @__PURE__ */ _jsxQ("div", {
     style: {
       display: "inline-grid",
-      gridTemplateColumns: `repeat(5, ${props.size === "small" ? "30px" : props.size === "large" ? "50px" : "40px"})`,
-      gridTemplateRows: `${props.size === "small" ? "15px" : props.size === "large" ? "25px" : "20px"} ${props.size === "small" ? "30px" : props.size === "large" ? "50px" : "40px"} ${props.size === "small" ? "15px" : props.size === "large" ? "25px" : "20px"}`,
-      gap: "2px",
-      padding: "10px",
-      borderRadius: "8px",
-      backgroundColor: props.backgroundColor || "#ffffff",
-      color: props.textColor || "#333333",
-      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+      gridTemplateColumns: `repeat(9, ${state.cellWidth})`,
+      gridTemplateRows: `${state.smallCellHeight} ${state.cellHeight} ${state.smallCellHeight}`,
+      gap: "1px",
+      padding: "3px",
+      borderRadius: "6px",
+      backgroundColor: state.backgroundColor,
+      color: state.textColor,
+      border: state.borderStyle,
       fontFamily: "'Roboto', sans-serif",
-      fontSize: `${props.size === "small" ? "15px" : props.size === "large" ? "25px" : "20px"}`
+      fontSize: state.fontSize,
+      "--time-picker-button-color": state.buttonColor,
+      "--time-picker-button-font-size": state.buttonFontSize,
+      "--time-picker-button-hover-color": state.buttonHoverColor,
+      "--time-picker-button-hover-bg-color": state.buttonHoverBackgroundColor,
+      "--time-picker-accent-color": state.accentColor
     }
   }, {
-    class: _fnSignal((p0) => `time-picker ${p0.size || "medium"}`, [
-      props
-    ], '`time-picker ${p0.size||"medium"}`')
+    class: "time-picker"
   }, [
     /* @__PURE__ */ _jsxQ("button", {
       onClick$: /* @__PURE__ */ inlinedQrl((event) => {
@@ -268,23 +299,17 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
       }, "TimePicker_component_div_button_onClick_Eytk0fGoBvQ", [
         props,
         state
-      ]),
+      ])
+    }, {
+      class: "time-picker-button",
       style: {
-        gridColumn: "1 / 3",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: props.accentColor || "#007bff",
-        fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "background-color 0.3s"
+        gridColumn: "1 / 5",
+        gridRow: "1 / 2"
       }
-    }, null, "▲", 2, null),
+    }, "+", 2, null),
     /* @__PURE__ */ _jsxQ("div", null, {
       style: {
-        gridColumn: "3 / 4"
+        gridColumn: "5 / 6"
       }
     }, null, 3, null),
     /* @__PURE__ */ _jsxQ("button", {
@@ -294,46 +319,61 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
       }, "TimePicker_component_div_button_onClick_1_WLLbkFC79Tw", [
         props,
         state
-      ]),
+      ])
+    }, {
+      class: "time-picker-button",
       style: {
-        gridColumn: "4 / 6",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: props.accentColor || "#007bff",
-        fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "background-color 0.3s"
+        gridColumn: "6 / 10",
+        gridRow: "1 / 2"
       }
-    }, null, "▲", 2, null),
+    }, "+", 2, null),
+    /* @__PURE__ */ _jsxQ("input", {
+      onChange$: /* @__PURE__ */ inlinedQrl((event) => {
+        const [props2, state2] = useLexicalScope();
+        return setHour(props2, state2, event.target.value);
+      }, "TimePicker_component_div_input_onChange_E9W6dmdesA8", [
+        props,
+        state
+      ])
+    }, {
+      class: "time-picker-input",
+      style: {
+        gridColumn: "1 / 5",
+        gridRow: "2 / 3"
+      },
+      type: "text",
+      value: _fnSignal((p0) => p0.hour.toString().padStart(2, "0"), [
+        state
+      ], 'p0.hour.toString().padStart(2,"0")')
+    }, null, 2, null),
     /* @__PURE__ */ _jsxQ("div", null, {
       style: {
-        gridColumn: "1 / 3",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontWeight: "bold"
-      }
-    }, state.hour.toString().padStart(2, "0"), 1, null),
-    /* @__PURE__ */ _jsxQ("div", null, {
-      style: {
-        gridColumn: "3 / 4",
+        gridColumn: "5 / 6",
+        gridRow: "2 / 3",
         display: "flex",
         justifyContent: "center",
         alignItems: "center"
       }
     }, ":", 3, null),
-    /* @__PURE__ */ _jsxQ("div", null, {
+    /* @__PURE__ */ _jsxQ("input", {
+      onChange$: /* @__PURE__ */ inlinedQrl((event) => {
+        const [props2, state2] = useLexicalScope();
+        return setMinute(props2, state2, event.target.value);
+      }, "TimePicker_component_div_input_onChange_1_uJYlkrkl08Q", [
+        props,
+        state
+      ])
+    }, {
+      class: "time-picker-input",
       style: {
-        gridColumn: "4 / 6",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontWeight: "bold"
-      }
-    }, state.minute.toString().padStart(2, "0"), 1, null),
+        gridColumn: "6 / 10",
+        gridRow: "2 / 3"
+      },
+      type: "text",
+      value: _fnSignal((p0) => p0.minute.toString().padStart(2, "0"), [
+        state
+      ], 'p0.minute.toString().padStart(2,"0")')
+    }, null, 2, null),
     /* @__PURE__ */ _jsxQ("button", {
       onClick$: /* @__PURE__ */ inlinedQrl((event) => {
         const [props2, state2] = useLexicalScope();
@@ -341,23 +381,17 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
       }, "TimePicker_component_div_button_onClick_2_QK0Ps0wke9A", [
         props,
         state
-      ]),
+      ])
+    }, {
+      class: "time-picker-button",
       style: {
-        gridColumn: "1 / 3",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: props.accentColor || "#007bff",
-        fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "background-color 0.3s"
+        gridColumn: "1 / 5",
+        gridRow: "3 / 4"
       }
-    }, null, "▼", 2, null),
+    }, "-", 2, null),
     /* @__PURE__ */ _jsxQ("div", null, {
       style: {
-        gridColumn: "3 / 4"
+        gridColumn: "5 / 6"
       }
     }, null, 3, null),
     /* @__PURE__ */ _jsxQ("button", {
@@ -367,28 +401,22 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
       }, "TimePicker_component_div_button_onClick_3_aiCod7OSrYQ", [
         props,
         state
-      ]),
+      ])
+    }, {
+      class: "time-picker-button",
       style: {
-        gridColumn: "4 / 6",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: props.accentColor || "#007bff",
-        fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "background-color 0.3s"
+        gridColumn: "6 / 10",
+        gridRow: "3 / 4"
       }
-    }, null, "▼", 2, null),
+    }, "-", 2, null),
     props.format === "12h" ? /* @__PURE__ */ _jsxQ("div", null, {
       style: {
-        gridColumn: "6 / 7",
+        gridColumn: "10 / 11",
         gridRow: "1 / 4",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        marginLeft: "10px"
+        marginLeft: "2px"
       }
     }, [
       /* @__PURE__ */ _jsxQ("button", {
@@ -398,17 +426,15 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
         }, "TimePicker_component_div_div_button_onClick_fkoud6A90yE", [
           props,
           state
-        ]),
-        style: {
-          background: "none",
-          border: "none",
-          color: state.period === "AM" ? props.accentColor || "#007bff" : "inherit",
-          cursor: "pointer",
-          padding: "5px",
-          fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-          fontWeight: "bold"
-        }
-      }, null, "AM", 2, null),
+        ])
+      }, {
+        class: "time-picker-period-button",
+        style: _fnSignal((p0) => ({
+          color: p0.period === "AM" ? "var(--accent-color)" : "var(--button-color)"
+        }), [
+          state
+        ], '{color:p0.period==="AM"?"var(--accent-color)":"var(--button-color)"}')
+      }, "AM", 2, null),
       /* @__PURE__ */ _jsxQ("button", {
         onClick$: /* @__PURE__ */ inlinedQrl((event) => {
           const [props2, state2] = useLexicalScope();
@@ -416,20 +442,62 @@ const TimePicker = /* @__PURE__ */ componentQrl(/* @__PURE__ */ inlinedQrl((prop
         }, "TimePicker_component_div_div_button_onClick_1_XeSpx4L00R8", [
           props,
           state
-        ]),
-        style: {
-          background: "none",
-          border: "none",
-          color: state.period === "PM" ? props.accentColor || "#007bff" : "inherit",
-          cursor: "pointer",
-          padding: "5px",
-          fontSize: `${props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px"}`,
-          fontWeight: "bold"
-        }
-      }, null, "PM", 2, null)
+        ])
+      }, {
+        class: "time-picker-period-button",
+        style: _fnSignal((p0) => ({
+          color: p0.period === "PM" ? "var(--accent-color)" : "var(--button-color)"
+        }), [
+          state
+        ], '{color:p0.period==="PM"?"var(--accent-color)":"var(--button-color)"}')
+      }, "PM", 2, null)
     ], 1, "fg_0") : null
   ], 1, "fg_1");
 }, "TimePicker_component_z1USFqM21dw"));
+const STYLES = `
+.time-picker {
+  --button-color: var(--time-picker-button-color);
+  --button-font-size: var(--time-picker-button-font-size);
+  --button-hover-color: var(--time-picker-button-hover-color);
+  --button-hover-bg-color: var(--time-picker-button-hover-bg-color);
+  --accent-color: var(--time-picker-accent-color);
+}
+.time-picker-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--button-color);
+  font-size: var(--button-font-size);
+  font-weight: bold;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.time-picker-button:hover {
+  opacity: 1;
+}
+.time-picker-input {
+  text-align: center;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  width: 100%;
+  padding: 0;
+}
+.time-picker-period-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px;
+  font-size: var(--button-font-size);
+  font-weight: bold;
+  transition: color 0.3s;
+}
+.time-picker-period-button:hover {
+  color: var(--button-hover-color);
+}
+`;
 export {
   AutoComplete,
   Greet,

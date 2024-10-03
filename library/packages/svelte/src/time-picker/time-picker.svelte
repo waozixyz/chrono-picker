@@ -7,6 +7,7 @@
     backgroundColor?: string;
     textColor?: string;
     accentColor?: string;
+    showBorder?: boolean;
   }
 </script>
 
@@ -15,11 +16,12 @@
 
   export let value: TimePickerProps["value"] = undefined;
   export let format: TimePickerProps["format"] = undefined;
-  export let onChange: TimePickerProps["onChange"] = undefined;
   export let size: TimePickerProps["size"] = undefined;
-  export let backgroundColor: TimePickerProps["backgroundColor"] = undefined;
-  export let textColor: TimePickerProps["textColor"] = undefined;
   export let accentColor: TimePickerProps["accentColor"] = undefined;
+  export let textColor: TimePickerProps["textColor"] = undefined;
+  export let backgroundColor: TimePickerProps["backgroundColor"] = undefined;
+  export let showBorder: TimePickerProps["showBorder"] = undefined;
+  export let onChange: TimePickerProps["onChange"] = undefined;
   function stringifyStyles(stylesObj) {
     let styles = "";
     for (let key in stylesObj) {
@@ -41,6 +43,19 @@
     newDate.setHours(newHour);
     newDate.setMinutes(minute);
     onChange?.(newDate);
+  }
+  function setHour(value: string) {
+    const hourInt = parseInt(value, 10);
+    if (isNaN(hourInt)) return;
+    const maxHour = format === "24h" ? 23 : 12;
+    hour = Math.max(0, Math.min(hourInt, maxHour));
+    updateTime();
+  }
+  function setMinute(value: string) {
+    const minuteInt = parseInt(value, 10);
+    if (isNaN(minuteInt)) return;
+    minute = Math.max(0, Math.min(minuteInt, 59));
+    updateTime();
   }
   function incrementHour() {
     hour = (hour + 1) % (format === "24h" ? 24 : 12);
@@ -69,6 +84,24 @@
   let hour = 0;
   let minute = 0;
   let period = "AM";
+  let cellWidth =
+    size === "small" ? "10px" : size === "large" ? "16px" : "13px";
+  let cellHeight =
+    size === "small" ? "24px" : size === "large" ? "38px" : "30px";
+  let smallCellHeight =
+    size === "small" ? "12px" : size === "large" ? "19px" : "15px";
+  let fontSize = size === "small" ? "12px" : size === "large" ? "20px" : "16px";
+  let buttonFontSize =
+    size === "small" ? "10px" : size === "large" ? "16px" : "13px";
+  let accentColor = accentColor || "#007bff";
+  let textColor = textColor || "#333333";
+  let backgroundColor = backgroundColor || "#ffffff";
+  let borderStyle = showBorder
+    ? `1px solid ${accentColor || "#007bff"}`
+    : "none";
+  let buttonColor = "#666666";
+  let buttonHoverColor = "#333333";
+  let buttonHoverBackgroundColor = "#f0f0f0";
 
   onMount(() => {
     const val = value || new Date();
@@ -92,84 +125,64 @@
 <div
   style={stringifyStyles({
     display: "inline-grid",
-    gridTemplateColumns: `repeat(5, ${
-      size === "small" ? "30px" : size === "large" ? "50px" : "40px"
-    })`,
-    gridTemplateRows: `${
-      size === "small" ? "15px" : size === "large" ? "25px" : "20px"
-    } ${size === "small" ? "30px" : size === "large" ? "50px" : "40px"} ${
-      size === "small" ? "15px" : size === "large" ? "25px" : "20px"
-    }`,
-    gap: "2px",
-    padding: "10px",
-    borderRadius: "8px",
-    backgroundColor: backgroundColor || "#ffffff",
-    color: textColor || "#333333",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+    gridTemplateColumns: `repeat(9, ${cellWidth})`,
+    gridTemplateRows: `${smallCellHeight} ${cellHeight} ${smallCellHeight}`,
+    gap: "1px",
+    padding: "3px",
+    borderRadius: "6px",
+    backgroundColor: backgroundColor,
+    color: textColor,
+    border: borderStyle,
     fontFamily: "'Roboto', sans-serif",
-    fontSize: `${
-      size === "small" ? "15px" : size === "large" ? "25px" : "20px"
-    }`,
+    fontSize: fontSize,
+    "--time-picker-button-color": buttonColor,
+    "--time-picker-button-font-size": buttonFontSize,
+    "--time-picker-button-hover-color": buttonHoverColor,
+    "--time-picker-button-hover-bg-color": buttonHoverBackgroundColor,
+    "--time-picker-accent-color": accentColor,
   })}
-  class={`time-picker ${size || "medium"}`}
+  class="time-picker"
 >
   <button
     style={stringifyStyles({
-      gridColumn: "1 / 3",
-      background: "none",
-      border: "none",
-      cursor: "pointer",
-      color: accentColor || "#007bff",
-      fontSize: `${
-        size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-      }`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "background-color 0.3s",
+      gridColumn: "1 / 5",
+      gridRow: "1 / 2",
     })}
+    class="time-picker-button"
     on:click={(event) => {
       incrementHour();
-    }}>▲</button
+    }}>+</button
   >
   <div
     style={stringifyStyles({
-      gridColumn: "3 / 4",
+      gridColumn: "5 / 6",
     })}
   />
   <button
     style={stringifyStyles({
-      gridColumn: "4 / 6",
-      background: "none",
-      border: "none",
-      cursor: "pointer",
-      color: accentColor || "#007bff",
-      fontSize: `${
-        size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-      }`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "background-color 0.3s",
+      gridColumn: "6 / 10",
+      gridRow: "1 / 2",
     })}
+    class="time-picker-button"
     on:click={(event) => {
       incrementMinute();
-    }}>▲</button
-  >
-  <div
+    }}>+</button
+  ><input
     style={stringifyStyles({
-      gridColumn: "1 / 3",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      fontWeight: "bold",
+      gridColumn: "1 / 5",
+      gridRow: "2 / 3",
     })}
-  >
-    {hour.toString().padStart(2, "0")}
-  </div>
+    type="text"
+    class="time-picker-input"
+    value={hour.toString().padStart(2, "0")}
+    on:change={(event) => {
+      setHour(event.target.value);
+    }}
+  />
   <div
     style={stringifyStyles({
-      gridColumn: "3 / 4",
+      gridColumn: "5 / 6",
+      gridRow: "2 / 3",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -177,83 +190,59 @@
   >
     :
   </div>
-  <div
+  <input
     style={stringifyStyles({
-      gridColumn: "4 / 6",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      fontWeight: "bold",
+      gridColumn: "6 / 10",
+      gridRow: "2 / 3",
     })}
-  >
-    {minute.toString().padStart(2, "0")}
-  </div>
-  <button
+    type="text"
+    class="time-picker-input"
+    value={minute.toString().padStart(2, "0")}
+    on:change={(event) => {
+      setMinute(event.target.value);
+    }}
+  /><button
     style={stringifyStyles({
-      gridColumn: "1 / 3",
-      background: "none",
-      border: "none",
-      cursor: "pointer",
-      color: accentColor || "#007bff",
-      fontSize: `${
-        size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-      }`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "background-color 0.3s",
+      gridColumn: "1 / 5",
+      gridRow: "3 / 4",
     })}
+    class="time-picker-button"
     on:click={(event) => {
       decrementHour();
-    }}>▼</button
+    }}>-</button
   >
   <div
     style={stringifyStyles({
-      gridColumn: "3 / 4",
+      gridColumn: "5 / 6",
     })}
   />
   <button
     style={stringifyStyles({
-      gridColumn: "4 / 6",
-      background: "none",
-      border: "none",
-      cursor: "pointer",
-      color: accentColor || "#007bff",
-      fontSize: `${
-        size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-      }`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "background-color 0.3s",
+      gridColumn: "6 / 10",
+      gridRow: "3 / 4",
     })}
+    class="time-picker-button"
     on:click={(event) => {
       decrementMinute();
-    }}>▼</button
+    }}>-</button
   >
   {#if format === "12h"}
     <div
       style={stringifyStyles({
-        gridColumn: "6 / 7",
+        gridColumn: "10 / 11",
         gridRow: "1 / 4",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        marginLeft: "10px",
+        marginLeft: "2px",
       })}
     >
       <button
         style={stringifyStyles({
-          background: "none",
-          border: "none",
-          color: period === "AM" ? accentColor || "#007bff" : "inherit",
-          cursor: "pointer",
-          padding: "5px",
-          fontSize: `${
-            size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-          }`,
-          fontWeight: "bold",
+          color:
+            period === "AM" ? "var(--accent-color)" : "var(--button-color)",
         })}
+        class="time-picker-period-button"
         on:click={(event) => {
           togglePeriod();
         }}
@@ -261,16 +250,10 @@
         AM
       </button><button
         style={stringifyStyles({
-          background: "none",
-          border: "none",
-          color: period === "PM" ? accentColor || "#007bff" : "inherit",
-          cursor: "pointer",
-          padding: "5px",
-          fontSize: `${
-            size === "small" ? "10px" : size === "large" ? "16px" : "13px"
-          }`,
-          fontWeight: "bold",
+          color:
+            period === "PM" ? "var(--accent-color)" : "var(--button-color)",
         })}
+        class="time-picker-period-button"
         on:click={(event) => {
           togglePeriod();
         }}
@@ -280,3 +263,48 @@
     </div>
   {/if}
 </div>
+
+<style>
+  .time-picker {
+    --button-color: var(--time-picker-button-color);
+    --button-font-size: var(--time-picker-button-font-size);
+    --button-hover-color: var(--time-picker-button-hover-color);
+    --button-hover-bg-color: var(--time-picker-button-hover-bg-color);
+    --accent-color: var(--time-picker-accent-color);
+  }
+  .time-picker-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--button-color);
+    font-size: var(--button-font-size);
+    font-weight: bold;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+  .time-picker-button:hover {
+    opacity: 1;
+  }
+  .time-picker-input {
+    text-align: center;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: bold;
+    width: 100%;
+    padding: 0;
+  }
+  .time-picker-period-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 1px;
+    font-size: var(--button-font-size);
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  .time-picker-period-button:hover {
+    color: var(--button-hover-color);
+  }
+</style>
