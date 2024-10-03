@@ -14,6 +14,8 @@ out/
 .svelte-kit/
 .svelte/
 
+packages/**/src
+
 # React specific
 build/
 
