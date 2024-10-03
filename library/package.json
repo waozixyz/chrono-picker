@@ -12,11 +12,13 @@
   },
   "dependencies": {
     "@builder.io/eslint-plugin-mitosis": "^0.0.15",
-    "@builder.io/mitosis": "latest",
-    "@builder.io/mitosis-cli": "latest",
-    "eslint": "^8.51.0"
+    "@builder.io/mitosis": "^0.5.1",
+    "@builder.io/mitosis-cli": "^0.5.1",
+    "eslint": "^8.51.0",
+    "luxon": "^3.5.0"
   },
   "devDependencies": {
-    "watch": "^1.0.2"
+    "@types/luxon": "^3.4.2",
+    "watch": "^0.13.0"
   }
 }

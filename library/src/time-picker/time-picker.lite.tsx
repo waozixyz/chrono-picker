@@ -2,7 +2,7 @@ import { useStore, onMount, onUpdate, useStyle } from '@builder.io/mitosis';
 
 export interface TimePickerProps {
   value?: Date;
-  onChange?: (time: Date) => void;
+  onChange?: (event: { target: { value: Date } }) => void;
   format?: '12h' | '24h';
   size?: 'small' | 'medium' | 'large';
   backgroundColor?: string;
@@ -37,7 +37,7 @@ export default function TimePicker(props: TimePickerProps) {
       const newDate = new Date(props.value || new Date());
       newDate.setHours(newHour);
       newDate.setMinutes(state.minute);
-      props.onChange?.(newDate);
+      props.onChange?.({ target: { value: newDate } });
     },
 
     setHour(value: string) {
