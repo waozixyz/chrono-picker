@@ -1,10 +1,11 @@
+import { PropFunction } from "@builder.io/qwik";
 export interface TimePickerProps {
     value?: Date;
-    onChange?: (event: {
+    onChange$?: PropFunction<(event: {
         target: {
             value: Date;
         };
-    }) => void;
+    }) => void>;
     format?: "12h" | "24h";
     size?: "small" | "medium" | "large";
     backgroundColor?: string;

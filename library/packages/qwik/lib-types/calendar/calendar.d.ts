@@ -1,11 +1,12 @@
+import { PropFunction } from "@builder.io/qwik";
 import { DateTime } from "luxon";
 export interface CalendarProps {
     value?: Date;
-    onChange?: (event: {
+    onChange$?: PropFunction<(event: {
         target: {
             value: Date;
         };
-    }) => void;
+    }) => void>;
     minDate?: Date;
     maxDate?: Date;
     backgroundColor?: string;
