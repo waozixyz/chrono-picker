@@ -16,11 +16,6 @@ out/
 
 # React specific
 build/
-*.js
-*.jsx
-*.ts
-*.tsx
-*.map
 
 # Qwik specific
 .qwik/

@@ -101,7 +101,6 @@
     : "none";
   let buttonColor = "#666666";
   let buttonHoverColor = "#333333";
-  let buttonHoverBackgroundColor = "#f0f0f0";
 
   onMount(() => {
     const val = value || new Date();
@@ -138,7 +137,6 @@
     "--time-picker-button-color": buttonColor,
     "--time-picker-button-font-size": buttonFontSize,
     "--time-picker-button-hover-color": buttonHoverColor,
-    "--time-picker-button-hover-bg-color": buttonHoverBackgroundColor,
     "--time-picker-accent-color": accentColor,
   })}
   class="time-picker"
@@ -269,7 +267,6 @@
     --button-color: var(--time-picker-button-color);
     --button-font-size: var(--time-picker-button-font-size);
     --button-hover-color: var(--time-picker-button-hover-color);
-    --button-hover-bg-color: var(--time-picker-button-hover-bg-color);
     --accent-color: var(--time-picker-accent-color);
   }
   .time-picker-button {

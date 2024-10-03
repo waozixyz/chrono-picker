@@ -1,182 +1,6 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const qwik = require("@builder.io/qwik");
-const setInputValue = function setInputValue2(props, state, value) {
-  state.inputVal = value;
-};
-const handleClick = function handleClick2(props, state, item) {
-  setInputValue(props, state, transform(props, state, item));
-  state.showSuggestions = false;
-};
-const fetchVals = function fetchVals2(props, state, city) {
-  if (props.getValues)
-    return props.getValues(city);
-  return fetch(`http://universities.hipolabs.com/search?name=${city}&country=united+states`).then((x) => x.json());
-};
-const transform = function transform2(props, state, x) {
-  return props.transformData ? props.transformData(x) : x.name;
-};
-const AutoComplete = /* @__PURE__ */ qwik.componentQrl(/* @__PURE__ */ qwik.inlinedQrl((props) => {
-  qwik.useStylesScopedQrl(/* @__PURE__ */ qwik.inlinedQrl(STYLES$1, "AutoComplete_component_useStylesScoped_o3cUATH7B2E"));
-  const state = qwik.useStore({
-    inputVal: "",
-    showSuggestions: false,
-    suggestions: []
-  });
-  qwik.useTaskQrl(/* @__PURE__ */ qwik.inlinedQrl(({ track }) => {
-    const [props2, state2] = qwik.useLexicalScope();
-    track(() => state2.inputVal);
-    track(() => props2.getValues);
-    fetchVals(props2, state2, state2.inputVal).then((newVals) => {
-      if (!newVals?.filter) {
-        console.error("Invalid response from getValues:", newVals);
-        return;
-      }
-      state2.suggestions = newVals.filter((data) => transform(props2, state2, data).toLowerCase().includes(state2.inputVal.toLowerCase()));
-    });
-  }, "AutoComplete_component_useTask_l7YiPqvcpV8", [
-    props,
-    state
-  ]));
-  return /* @__PURE__ */ qwik._jsxQ("div", null, {
-    class: "div-AutoComplete"
-  }, [
-    "Autocomplete:",
-    /* @__PURE__ */ qwik._jsxQ("div", null, {
-      class: "div-AutoComplete-2"
-    }, [
-      /* @__PURE__ */ qwik._jsxQ("input", {
-        onChange$: /* @__PURE__ */ qwik.inlinedQrl((event) => {
-          const [state2] = qwik.useLexicalScope();
-          return state2.inputVal = event.target.value;
-        }, "AutoComplete_component_div_div_input_onChange_6mXcLXfuvEY", [
-          state
-        ]),
-        onFocus$: /* @__PURE__ */ qwik.inlinedQrl((event) => {
-          const [state2] = qwik.useLexicalScope();
-          return state2.showSuggestions = true;
-        }, "AutoComplete_component_div_div_input_onFocus_hiv3EZxZ30k", [
-          state
-        ])
-      }, {
-        class: "input-AutoComplete",
-        placeholder: "Search for a U.S. university",
-        value: qwik._fnSignal((p0) => p0.inputVal, [
-          state
-        ], "p0.inputVal")
-      }, null, 2, null),
-      /* @__PURE__ */ qwik._jsxQ("button", {
-        onClick$: /* @__PURE__ */ qwik.inlinedQrl((event) => {
-          const [state2] = qwik.useLexicalScope();
-          state2.inputVal = "";
-          state2.showSuggestions = false;
-        }, "AutoComplete_component_div_div_button_onClick_6cLGIshtFQo", [
-          state
-        ])
-      }, {
-        class: "button-AutoComplete"
-      }, "X", 2, null)
-    ], 1, null),
-    state.suggestions.length > 0 && state.showSuggestions ? /* @__PURE__ */ qwik._jsxQ("ul", null, {
-      class: "ul-AutoComplete"
-    }, (state.suggestions || []).map((item, idx) => {
-      return /* @__PURE__ */ qwik._jsxQ("li", {
-        onClick$: /* @__PURE__ */ qwik.inlinedQrl((event) => {
-          const [item2, props2, state2] = qwik.useLexicalScope();
-          return handleClick(props2, state2, item2);
-        }, "AutoComplete_component_div_ul_li_onClick_aX7z0Lyjr9E", [
-          item,
-          props,
-          state
-        ])
-      }, {
-        class: "li-AutoComplete"
-      }, props.renderChild ? /* @__PURE__ */ qwik._jsxC(props.renderChild, {
-        item
-      }, 3, "tU_0") : /* @__PURE__ */ qwik._jsxQ("span", null, null, transform(props, state, item), 1, null), 0, idx);
-    }), 1, "tU_1") : null
-  ], 1, "tU_2");
-}, "AutoComplete_component_2b0Y8LQOXVI"));
-const STYLES$1 = `
-.div-AutoComplete {
-  padding: 10px;
-  max-width: 700px;
-}
-.div-AutoComplete-2 {
-  position: relative;
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-}
-.input-AutoComplete {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  border-radius: 0.25rem;
-  border-width: 1px;
-  border-color: #000000;
-  width: 100%;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-.button-AutoComplete {
-  cursor: pointer;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  border-radius: 0.25rem;
-  color: #ffffff;
-  background-color: #ef4444;
-}
-.ul-AutoComplete {
-  border-radius: 0.25rem;
-  height: 10rem;
-  margin: unset;
-  padding: unset;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-.li-AutoComplete {
-  display: flex;
-  padding: 0.5rem;
-  align-items: center;
-  border-bottom-width: 1px;
-  border-color: #e5e7eb;
-  cursor: pointer;
-}
-.li-AutoComplete:hover {
-  background-color: #f3f4f6;
-}
-`;
-const Greet = /* @__PURE__ */ qwik.componentQrl(/* @__PURE__ */ qwik.inlinedQrl((props) => {
-  const state = qwik.useStore({
-    name: ""
-  });
-  return /* @__PURE__ */ qwik._jsxQ("div", null, null, [
-    /* @__PURE__ */ qwik._jsxQ("input", {
-      onChange$: /* @__PURE__ */ qwik.inlinedQrl((event) => {
-        const [state2] = qwik.useLexicalScope();
-        return state2.name = event.target.value;
-      }, "Greet_component_div_input_onChange_UXiqnZXQV34", [
-        state
-      ])
-    }, {
-      placeholder: "Your name",
-      value: qwik._fnSignal((p0) => p0.name, [
-        state
-      ], "p0.name")
-    }, null, 2, null),
-    /* @__PURE__ */ qwik._jsxQ("div", null, null, [
-      "Hello, ",
-      qwik._fnSignal((p0) => p0.name, [
-        state
-      ], "p0.name"),
-      "!"
-    ], 3, null)
-  ], 1, "Zt_0");
-}, "Greet_component_NoxKRhmUmS8"));
 const updateTime = function updateTime2(props, state) {
   let newHour = state.hour;
   if (props.format === "12h") {
@@ -236,7 +60,6 @@ const TimePicker = /* @__PURE__ */ qwik.componentQrl(/* @__PURE__ */ qwik.inline
     borderStyle: props.showBorder ? `1px solid ${props.accentColor || "#007bff"}` : "none",
     buttonColor: "#666666",
     buttonFontSize: props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px",
-    buttonHoverBackgroundColor: "#f0f0f0",
     buttonHoverColor: "#333333",
     cellHeight: props.size === "small" ? "24px" : props.size === "large" ? "38px" : "30px",
     cellWidth: props.size === "small" ? "10px" : props.size === "large" ? "16px" : "13px",
@@ -288,7 +111,6 @@ const TimePicker = /* @__PURE__ */ qwik.componentQrl(/* @__PURE__ */ qwik.inline
       "--time-picker-button-color": state.buttonColor,
       "--time-picker-button-font-size": state.buttonFontSize,
       "--time-picker-button-hover-color": state.buttonHoverColor,
-      "--time-picker-button-hover-bg-color": state.buttonHoverBackgroundColor,
       "--time-picker-accent-color": state.accentColor
     }
   }, {
@@ -461,7 +283,6 @@ const STYLES = `
   --button-color: var(--time-picker-button-color);
   --button-font-size: var(--time-picker-button-font-size);
   --button-hover-color: var(--time-picker-button-hover-color);
-  --button-hover-bg-color: var(--time-picker-button-hover-bg-color);
   --accent-color: var(--time-picker-accent-color);
 }
 .time-picker-button {
@@ -500,6 +321,4 @@ const STYLES = `
   color: var(--button-hover-color);
 }
 `;
-exports.AutoComplete = AutoComplete;
-exports.Greet = Greet;
 exports.TimePicker = TimePicker;
