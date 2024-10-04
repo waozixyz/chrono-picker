@@ -1,6 +1,7 @@
 import {
   $,
   Fragment,
+  PropFunction,
   component$,
   h,
   useStore,
@@ -11,11 +12,7 @@ import {
 
 export interface TimePickerProps {
   value?: Date;
-  onChange?: (event: {
-    target: {
-      value: Date;
-    };
-  }) => void;
+  onChange$?: PropFunction<(event: { target: { value: Date } }) => void>;
   format?: "12h" | "24h";
   size?: "small" | "medium" | "large";
   backgroundColor?: string;

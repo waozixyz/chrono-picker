@@ -9,6 +9,7 @@ import {
   h,
   useStore,
   useStylesScoped$,
+  PropFunction
 } from "@builder.io/qwik";
 
 export interface DateTimePickerProps {

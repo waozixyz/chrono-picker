@@ -1,6 +1,7 @@
 import {
   $,
   Fragment,
+  PropFunction,
   component$,
   h,
   useStore,
@@ -13,11 +14,8 @@ import { DateTime, Info } from "luxon";
 
 export interface CalendarProps {
   value?: Date;
-  onChange?: (event: {
-    target: {
-      value: Date;
-    };
-  }) => void;
+  onChange$?: PropFunction<(event: { target: { value: Date } }) => void>;
+  
   minDate?: Date;
   maxDate?: Date;
   backgroundColor?: string;
@@ -27,18 +25,22 @@ export interface CalendarProps {
   locale?: string;
 }
 export const changeMonth = function changeMonth(props, state, delta: number) {
-  state.currentMonth = state.currentMonth
-    .plus({
-      months: delta,
-    })
-    .startOf("month") as DateTime<true>;
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  state.currentMonthISO =
+    currentMonth
+      .plus({
+        months: delta,
+      })
+      .startOf("month")
+      .toISO() || "";
 };
 export const selectDate = function selectDate(props, state, day: number) {
-  const newDate = state.currentMonth.set({
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  const newDate = currentMonth.set({
     day,
-  }) as DateTime<true>;
-  if (isDateInRange(props, state, newDate)) {
-    state.selectedDate = newDate;
+  });
+  if (newDate.isValid && isDateInRange(props, state, newDate)) {
+    state.selectedDateISO = newDate.toISO() || "";
     props.onChange?.({
       target: {
         value: newDate.toJSDate(),
@@ -47,33 +49,53 @@ export const selectDate = function selectDate(props, state, day: number) {
   }
 };
 export const getEmptyCells = function getEmptyCells(props, state) {
-  return Array(state.currentMonth.weekday % 7).fill(null);
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  return Array(currentMonth.isValid ? currentMonth.weekday % 7 : 0).fill(null);
 };
 export const getDayCells = function getDayCells(props, state) {
-  return Array(state.currentMonth.daysInMonth).fill(null);
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  return Array(currentMonth.isValid ? currentMonth.daysInMonth : 0).fill(null);
 };
 export const isSelected = function isSelected(props, state, day: number) {
-  return state.selectedDate.hasSame(
-    state.currentMonth.set({
-      day,
-    }) as DateTime<true>,
-    "day"
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  const selectedDate = DateTime.fromISO(state.selectedDateISO);
+  return (
+    currentMonth.isValid &&
+    selectedDate.isValid &&
+    selectedDate.hasSame(
+      currentMonth.set({
+        day,
+      }),
+      "day"
+    )
   );
 };
 export const isDateInRange = function isDateInRange(
   props,
   state,
-  date: DateTime<true>
+  date: DateTime
 ) {
-  return date >= state.minDate && date <= state.maxDate;
+  const minDate = DateTime.fromISO(state.minDateISO);
+  const maxDate = DateTime.fromISO(state.maxDateISO);
+  return (
+    date.isValid &&
+    minDate.isValid &&
+    maxDate.isValid &&
+    date >= minDate &&
+    date <= maxDate
+  );
 };
 export const isDisabled = function isDisabled(props, state, day: number) {
-  return !isDateInRange(
-    props,
-    state,
-    state.currentMonth.set({
-      day,
-    }) as DateTime<true>
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  return (
+    !currentMonth.isValid ||
+    !isDateInRange(
+      props,
+      state,
+      currentMonth.set({
+        day,
+      })
+    )
   );
 };
 export const getWeekdays = function getWeekdays(props, state) {
@@ -82,10 +104,13 @@ export const getWeekdays = function getWeekdays(props, state) {
   });
 };
 export const formatMonth = function formatMonth(props, state) {
-  return state.currentMonth.toLocaleString({
-    month: "long",
-    year: "numeric",
-  });
+  const currentMonth = DateTime.fromISO(state.currentMonthISO);
+  return currentMonth.isValid
+    ? currentMonth.toLocaleString({
+        month: "long",
+        year: "numeric",
+      })
+    : "";
 };
 export const Calendar = component$((props: CalendarProps) => {
   useStylesScoped$(STYLES);
@@ -93,35 +118,41 @@ export const Calendar = component$((props: CalendarProps) => {
   const state = useStore<any>({
     accentColor: props.accentColor || "#007bff",
     backgroundColor: props.backgroundColor || "#ffffff",
-    currentMonth: DateTime.local().startOf("month"),
+    currentMonthISO: DateTime.local().startOf("month").toISO() || "",
     fontSize: props.fontSize || "14px",
     locale: props.locale || "en",
-    maxDate: props.maxDate
-      ? DateTime.fromJSDate(props.maxDate)
-      : DateTime.local().plus({
-          years: 100,
-        }),
-    minDate: props.minDate
-      ? DateTime.fromJSDate(props.minDate)
-      : DateTime.local().minus({
-          years: 100,
-        }),
-    selectedDate: DateTime.local(),
+    maxDateISO:
+      (props.maxDate
+        ? DateTime.fromJSDate(props.maxDate)
+        : DateTime.local().plus({
+            years: 100,
+          })
+      ).toISO() || "",
+    minDateISO:
+      (props.minDate
+        ? DateTime.fromJSDate(props.minDate)
+        : DateTime.local().minus({
+            years: 100,
+          })
+      ).toISO() || "",
+    selectedDateISO: DateTime.local().toISO() || "",
     textColor: props.textColor || "#333333",
   });
   useVisibleTask$(() => {
-    state.currentMonth = (
-      props.value ? DateTime.fromJSDate(props.value) : DateTime.local()
-    ).startOf("month") as DateTime<true>;
-    state.selectedDate = (
-      props.value ? DateTime.fromJSDate(props.value) : DateTime.local()
-    ) as DateTime<true>;
+    const initialDate = props.value
+      ? DateTime.fromJSDate(props.value)
+      : DateTime.local();
+    state.currentMonthISO = initialDate.startOf("month").toISO() || "";
+    state.selectedDateISO = initialDate.toISO() || "";
   });
   useTask$(({ track }) => {
     track(() => props.value);
     if (props.value) {
-      state.selectedDate = DateTime.fromJSDate(props.value);
-      state.currentMonth = state.selectedDate.startOf("month");
+      const selectedDate = DateTime.fromJSDate(props.value);
+      if (selectedDate.isValid) {
+        state.selectedDateISO = selectedDate.toISO() || "";
+        state.currentMonthISO = selectedDate.startOf("month").toISO() || "";
+      }
     }
   });
 
